@@ -1,0 +1,96 @@
+%!TEX program = xelatex
+\documentclass[50pt]{article}
+\usepackage[a4paper, left=1in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{xeCJK} %调用 xeCJK 宏包
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{graphicx}
+\author{Lan Haixiang}
+\title{Team Project Part 1}
+\date{\today}
+\begin{document}
+
+\maketitle
+
+\clearpage
+\tableofcontents
+\section{background knowledge}
+\subsection{Decision Tree}
+Decision tree has advantages:
+\begin{itemize}
+    \item Simple Idea: IF\dots THEN\dots
+    \item It can deal with high dimension data and winnow importan variables.
+    \item The results are easy to understand.
+    \item Quick calculation
+    \item Ideal correctness
+\end{itemize}
+CART decision tree is called Classification and Regression tree. When the dataset is of 
+continuous type, the tree can be a Regression Tree. We can predict the value
+by the expected value of leaf nodes. When dataset is of discrete type, we can regard it
+as a Classification Tree. The tree \textbf{is a binary tree}. One feature can
+be used many times. Every non-leaf node can only extend to two children.
+
+\subsection{Entropy}
+    Definition: the degree of disorder or randomness in the system.\\
+    Suppose X is a discrete random variable, the pmf:
+    $$P(X = X_i) = p_i, i = 1, 2, \dots, n$$
+    then the entropy of RV X is:
+    $$H(X) = -\sum_{i=1}^{n}p_{i}log_{2}{p_i}$$
+    The more the entropy is, the unceritainty the RV is.
+\subsection{Conditional Entropy}
+    In the given condition of X, the conditional entropy of RV Y $H(Y|X)$ is defined as:
+    $$H(Y|X) = \sum_{i=1}^{n}p_{i}H(Y|X=X_{i})$$
+    In the equation, $p_{i} = P(X=X_{i})$
+\subsection{Information Gain}
+    Definition: Information gain is the reduction in entropy or surprise by transforming 
+    a dataset and is often used in training decision trees. Information gain is calculated 
+    by comparing the entropy of the dataset before and after a transformation.\\
+    The information gain that the feature A contribuites to dataset D is called 
+    $$g(D, A) = H(D) - H(D|A)$$
+    For the dataset D, we need to calculate the information regarding to each feature and
+    each feature value, and choose the largest one, which is the best.\\
+    Suppose a training dataset D, the capacity is |D|, has $k$ categories $C_k$, $|C_k|$
+    is the sample number of $C_k$. Suppose one feature $A$ has n values $a_{1},a_{2},\dots, a{n}$
+     We can divide D into n subsets $D_{1}, D_{2}, \dots, D_{n}$, $|D_{i}|$ is 
+     the sample number of $D_{i}$. We denote $D_{ik}$ as a subset of $D_{i}$ which belong to
+     $C_{k}$, $|D_{ik}|$ is the sample number of $D_{ik}$. We then calculate the information 
+     gain as follows:\\
+     \begin{enumerate}
+         \item calculate $$H(D) = -\sum_{k=1}^{K}\frac{|C_{k}|}{|D|}log_{2}\frac{|C_{k}|}{|D|}$$.
+         \item calculate the conditional entropy of feature A contributing to D 
+         $$H(D|A) = \sum_{i=1}^{n}\frac{|D_{i}}{|D|}\sum_{k=1}^{K}\frac{|D_{ik}|}{|D{i}|}log_{2}\frac{|D_{ik}|}{|D_{i}|}$$
+         \item calculate information gain $$g(D,A) = H(D) - H(D|A)$$
+     \end{enumerate}
+\subsection{Information Gain Ratio}
+     Sometimes we may choose improperly a feature that has too much values. Such situation makes no sense.
+     We must correct it using information gain ratio.
+     $$g_{R}(D,A) = \frac{g(D,A)}{H_{A}(D)}$$
+     $$H_{A}(D) = -\sum_{i=1}^{n}\frac{|D_{i}|}{|D|} log_{2}\frac{|D_{i}|}{|D|}$$
+\subsection{Gini Index}
+    $$Gini(D) = 1 - \sum_{i=1}^{m}p^{2}_{i}$$
+    In the equation, $p_i$ is the probability of class $C_i$ in $D$\\
+    For a discrete variable, we need to calculate the weight sum of each zone's impurity, As the following:
+    $$Gini_{A}(D) = \frac{|D_1|}{|D|}Gini(D_1) + \frac{|D_2|}{|D|}Gini(D_2)$$
+    For a continuous variable, we can set a dividing point to get the same goal.\\
+    Our goal is to make the weight sum as small as possible by choose the best feature and
+    the best feature value.
+\section{Get Access to Data}
+     Use numpy module to transform csv file into ndarray class.
+\section{Build a Decition Tree}
+\begin{itemize}
+    \item Starting from root node, calculate the possible \textbf{information gain/information gain
+    ratio/gini index} regarding each feature
+    and value. Choose the best information gain/ratio/gini index. Construct different child nodes according to 
+    the feature and value.
+    \item Use recursion to the child node and build the tree.
+    \item Until all the labels are the same after selection.
+\end{itemize}
+
+\subsection{Feature Choice}
+The most popular methods are:
+\begin{itemize}
+    \item ID3: Depend on information gain
+    \item CD4.5: Depend on information gain ratio
+    \item CART: Depend on Gini Index when it is Classification Tree, on MSE when it is Regression Tree.
+\end{itemize}
+\end{document}
