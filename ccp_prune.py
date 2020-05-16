@@ -103,13 +103,12 @@ def cost_complexity_algorithm(tree, X):
 
 
 def shuffle(li, seed):
-    N = len(li)
-    for i, j in enumerate(li):
-        if i % (seed+2) == 0:
-            li[i], li[i-N] = li[i], li[i-N]
+    for i in range(50):
+        li.remove(li[seed])
+        li.append(li[seed])
 
 
-def process(features, X):
+def process(features, X, seed):
     confusion_matrix = [[0, 0], [0, 0]]
 
     def classification(t, test_data):
@@ -130,8 +129,8 @@ def process(features, X):
 
     best_tree = None
     best_score = 100000000
-    for k in range(50):
-        shuffle(X, k)
+    for k in range(0,100,10):
+        shuffle(X, seed + k)
         mid = int(len(X) * 0.5)
 
         my_tree = Tree(features)

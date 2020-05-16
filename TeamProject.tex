@@ -6,9 +6,11 @@
 \usepackage{listings}
 \usepackage{amsmath}
 \usepackage{color}
+\usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{verbatimbox}
+\allowdisplaybreaks
 \usetikzlibrary{trees}
 
 \title{Team Project Part 1}
@@ -164,5 +166,20 @@ Step2: Pick the best tree from $\{T_{0}, T_{1},..., T_{M}\}$, according to its p
 	child [missing] {}
 	child [missing] {}	
 	child { node [selected] {pep-prune.py}};
-	\end{tikzpicture}
+    \end{tikzpicture}
+\section{Result}
+We can attain 89.7916666667 percent accuracy
+\makeatletter
+\setlength{@fptop}{5pt}
+\subsection{The Confusion Matrix}
+
+\begin{table}[]
+    \begin{tabular}{lll}
+     & True Bad Wine & True Good Wine \\
+     Predicted Bad Wine & 395 & 28 \\
+     Predicted Good Wine & 21 & 36 \\
+     &  & 
+    \end{tabular}
+\end{table}
+
 \end{document}

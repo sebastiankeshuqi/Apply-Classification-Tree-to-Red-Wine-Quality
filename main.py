@@ -2,6 +2,8 @@ import data
 import ccp_prune
 import pep_prune
 
+shitseed = [0,0]
+
 confusion_matrix = [[0, 0], [0, 0]]
 
 
@@ -23,7 +25,7 @@ def classification(t, test_data):
 
 
 features, X = data.get_data('train.csv')
-best_tree = ccp_prune.process(features,X)
+best_tree = ccp_prune.process(features,X, 1080)
 features, X = data.get_data('test.csv')
 confusion_matrix = [[0, 0], [0, 0]]
 print('Test Accuracy = {}'.format(classification(best_tree.root, X)/len(X)))

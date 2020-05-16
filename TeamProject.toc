@@ -15,3 +15,5 @@
 \contentsline {subsubsection}{\numberline {4.2.2}PEP(Pessimistic-Error Pruning)}{5}% 
 \contentsline {subsubsection}{\numberline {4.2.3}CCP(Cost-Complexity Pruning)}{5}% 
 \contentsline {section}{\numberline {5}Code structure}{5}% 
+\contentsline {section}{\numberline {6}Result}{5}% 
+\contentsline {subsection}{\numberline {6.1}The Confusion Matrix}{5}% 
