@@ -1,13 +1,14 @@
-import numpy as np 
+import numpy as np
 import matplotlib as plt
 from collections import Counter
 from math import log
 import sys
 import time
 
+
 class ListQueue:
 
-    def __init__(self,capacity):
+    def __init__(self, capacity):
         self.__capacity = capacity
         self.__data = [None] * self.__capacity
         self.__size = 0
@@ -36,7 +37,7 @@ class ListQueue:
         self.__size -= 1
         return answer
 
-    def enqueue(self,e):
+    def enqueue(self, e):
         if self.__size == self.__capacity:
             print('The queue is full.')
             return None
@@ -50,8 +51,10 @@ class ListQueue:
     def __repr__(self):
         return str(self)
 
+
 class TreeNode():
     """树结点"""
+
     def __init__(self, feature_idx=None, feature_val=None, feature_name=None, node_val=None, child=None):
         """
         feature_idx:
@@ -72,6 +75,7 @@ class TreeNode():
         self._node_val = node_val
         # 非叶结点存储划分信息
         self._child = child
+
     def DFSearch(self):
         if self._child != None:
             print(self._feature_name)
@@ -84,7 +88,7 @@ class TreeNode():
                 self._child[0].DFSearch()
             if self._child[1] is not None:
                 self._child[1].DFSearch()
-    
+
     def BFSearch(self):
 
         q = ListQueue(2000)
@@ -101,8 +105,10 @@ class TreeNode():
             elif cNode._node_val is not None:
                 print(cNode._node_val)
 
+
 class DecisionTreeScratch():
     """决策树算法Scratch实现"""
+
     def __init__(self, feature_name, etype="gain"):
         """
         feature_name:
@@ -117,7 +123,6 @@ class DecisionTreeScratch():
         self._fea_name = feature_name
         self._etype = etype
 
-
     def _build_tree(self, X, y):
         """
         构建树
@@ -129,7 +134,8 @@ class DecisionTreeScratch():
         # 子树只剩下一个类别时直接置为叶结点
         if np.unique(y).shape[0] == 1:
             return TreeNode(node_val=y[0])
-        max_gain, max_fea_idx, fea_val = self.try_split(X,y,choice=self._etype)
+        max_gain, max_fea_idx, fea_val = self.try_split(
+            X, y, choice=self._etype)
         feature_name = self._fea_name[max_fea_idx]
         child_tree = dict()
         # 遍历所选特征每一个可能的值，对每一个值构建子树
@@ -137,13 +143,13 @@ class DecisionTreeScratch():
         child_X_l = X[X[:, max_fea_idx] <= fea_val]
         child_y_l = y[X[:, max_fea_idx] <= fea_val]
         child_X_r = X[X[:, max_fea_idx] > fea_val]
-        child_y_r = y[X[:, max_fea_idx] > fea_val]        
+        child_y_r = y[X[:, max_fea_idx] > fea_val]
         # 构建子树
         child_tree[0] = self._build_tree(child_X_l, child_y_l)
         child_tree[1] = self._build_tree(child_X_r, child_y_r)
         return TreeNode(max_fea_idx, feature_name=feature_name, child=child_tree, feature_val=fea_val)
 
-    def get_entropy(self,y):
+    def get_entropy(self, y):
         """
         计算熵
         y:
@@ -156,6 +162,7 @@ class DecisionTreeScratch():
             p = num_ck[1][i] / len(y)
             entropy -= p * np.log2(p)
         return entropy
+
     def get_conditional_entropy(self, x, y, value):
         """
         计算条件熵
@@ -165,13 +172,15 @@ class DecisionTreeScratch():
             数据集标签
         """
         cond_entropy = 0
-        X_l, X_r, y_l, y_r = self.split(x.reshape(x.shape[0],1),y,0,value=value)
+        X_l, X_r, y_l, y_r = self.split(
+            x.reshape(x.shape[0], 1), y, 0, value=value)
         sub_entropy1 = self.get_entropy(y_l)
         sub_entropy2 = self.get_entropy(y_r)
         p1 = len(y_l) / len(y)
         p2 = len(y_r) / len(y)
         cond_entropy = p1*sub_entropy1 + p2*sub_entropy2
         return cond_entropy
+
     def get_gain(self, x, y, value):
         """
         计算信息增益
@@ -180,9 +189,9 @@ class DecisionTreeScratch():
         y:
             数据集标签
         """
-        return self.get_entropy(y) - self.get_conditional_entropy(x, y,value=value)
+        return self.get_entropy(y) - self.get_conditional_entropy(x, y, value=value)
 
-    def get_gain_ration(self, x, y,value):
+    def get_gain_ration(self, x, y, value):
         """
         计算信息增益比
         x:
@@ -190,19 +199,19 @@ class DecisionTreeScratch():
         y:
             数据集标签
         """
-        m = self.get_gain(x, y,value=value)
+        m = self.get_gain(x, y, value=value)
         n = self.get_entropy(x)
         if n != 0:
             return m/n
         else:
             return 0
 
-    def split(self,X,y,d,value):
-        index_a = (X[:,d] <= value)
-        index_b = (X[:,d] > value)
-        return X[index_a], X[index_b], y[index_a], y[index_b]  
+    def split(self, X, y, d, value):
+        index_a = (X[:, d] <= value)
+        index_b = (X[:, d] > value)
+        return X[index_a], X[index_b], y[index_a], y[index_b]
 
-    def gini(self,y):
+    def gini(self, y):
         counter = Counter(y)
         res = 1.0
         for num in counter.values():
@@ -217,30 +226,34 @@ class DecisionTreeScratch():
         best_d, best_v = -1, -1
         for d in range(X.shape[1]):
             sorted_index = np.argsort(X[:, d])
-            for i in range(1,len(X)):
+            for i in range(1, len(X)):
                 if X[sorted_index[i-1], d] != X[sorted_index[i], d]:
-                    v = (X[sorted_index[i-1], d]+X[sorted_index[i], d])/2 
-                    x_l, x_r, y_l, y_r = self.split(X, y, d, v) 
+                    v = (X[sorted_index[i-1], d]+X[sorted_index[i], d])/2
+                    x_l, x_r, y_l, y_r = self.split(X, y, d, v)
                     length = len(y_l) + len(y_r)
                     if choice == 'gini':
-                        g = len(y_l)/length*self.gini(y_l) + len(y_r)/length*self.gini(y_r)
+                        g = len(y_l)/length*self.gini(y_l) + \
+                            len(y_r)/length*self.gini(y_r)
                         if g < best_g:
                             best_g, best_d, best_v = g, d, v
                     elif choice == 'gain':
-                        g = self.get_gain(X[:, d], y,value=v)
+                        g = self.get_gain(X[:, d], y, value=v)
                         if g > best_g:
                             best_g, best_v, best_d = g, v, d
                     else:
-                        g = self.get_gain_ration(X[:, d], y,value=v)
+                        g = self.get_gain_ration(X[:, d], y, value=v)
                         if g > best_g:
-                            best_g, best_v, best_d = g, v, d                        
+                            best_g, best_v, best_d = g, v, d
         return best_g, best_d, best_v
 
+
 if __name__ == '__main__':
-    data = np.genfromtxt('train.csv',dtype=np.float64,encoding='utf-8-sig',delimiter=',')
-    X = data[1:51,:-2]
-    y = data[1:51,-1]
-    tree = DecisionTreeScratch(etype='ratio',feature_name=np.array(['fixed acidity', ' volatile acidity', ' citric acid', ' residual sugar', ' chlorides', ' free sulfur dioxide', ' total sulfur dioxide', ' density', ' pH', ' sulphates', ' alcohol', ' quality', 'result']))
-    root = tree._build_tree(X,y)
+    data = np.genfromtxt('train.csv', dtype=np.float64,
+                         encoding='utf-8-sig', delimiter=',')
+    X = data[1:51, :-2]
+    y = data[1:51, -1]
+    tree = DecisionTreeScratch(etype='ratio', feature_name=np.array(['fixed acidity', ' volatile acidity', ' citric acid', ' residual sugar',
+                                                                     ' chlorides', ' free sulfur dioxide', ' total sulfur dioxide', ' density', ' pH', ' sulphates', ' alcohol', ' quality', 'result']))
+    root = tree._build_tree(X, y)
     root.DFSearch()
     root.BFSearch()

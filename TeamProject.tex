@@ -2,10 +2,15 @@
 \documentclass[50pt]{article}
 \usepackage[a4paper, left=1in, right=1in, top=1in, bottom=1in]{geometry}
 \usepackage{xeCJK} %调用 xeCJK 宏包
+\usepackage{xcolor}
+\usepackage{listings}
 \usepackage{amsmath}
 \usepackage{color}
 \usepackage{graphicx}
-\author{Lan Haixiang}
+\usepackage{tikz}
+\usepackage{verbatimbox}
+\usetikzlibrary{trees}
+
 \title{Team Project Part 1}
 \date{\today}
 \begin{document}
@@ -75,7 +80,18 @@ be used many times. Every non-leaf node can only extend to two children.
     Our goal is to make the weight sum as small as possible by choose the best feature and
     the best feature value.
 \section{Get Access to Data}
-     Use numpy module to transform csv file into ndarray class.
+     Use open() function to extract data from csv files.
+     \begin{lstlisting}[language={python}]
+        def get_data(file_name):
+            f = open(file_name,'r').readlines()
+            data_name = f[0].split(',')[:-1]
+            data = []
+            for i in f[1:]:
+                d = [float(j) for j in i.split(',')]
+                d[-1] = d[-1] > 6 # Transform the quality figures into True or False
+                data.append(d)
+            return data_name, data
+     \end{lstlisting}
 \section{Build a Decition Tree}
 \begin{itemize}
     \item Starting from root node, calculate the possible \textbf{information gain/information gain
@@ -85,7 +101,6 @@ be used many times. Every non-leaf node can only extend to two children.
     \item Use recursion to the child node and build the tree.
     \item Until all the labels are the same after selection.
 \end{itemize}
-
 \subsection{Feature Choice}
 The most popular methods are:
 \begin{itemize}
@@ -93,4 +108,61 @@ The most popular methods are:
     \item CD4.5: Depend on information gain ratio
     \item CART: Depend on Gini Index when it is Classification Tree, on MSE when it is Regression Tree.
 \end{itemize}
+    Here we use CART to construct the classification tree.
+\section{Prune the Tree}
+We can do pruning to optimize the tree size and reduce overfitting. Generally, there are two kinds of pruning: Pre-pruning and Post-pruning. 
+\subsection{Pre-pruning}
+\begin{itemize}
+    \item Pre-pruning is also called early stoping.
+    \item Pre-pruning stops the tree before it grows perfectly.
+    \item People can set maximum depth of the tree to restrict the tree.
+\end{itemize}
+\subsection{Post-pruning}
+\subsubsection{REP(Reduced-Error Pruning)}
+REP is one of the simplest forms of Post-pruning.\\
+First, calculate the error of a subtree $E_{r}(t)$.
+Then, calculate the error of each leaf node of this subtree $E_{t}(Tt)$.
+If $$\ E_{r}(t) < \sum E_{r}(T_{t})$$
+Then, replace the subtree with a leaf node, whose label is determined by the majority label of the subtree. Repeat this process from the bottom of the tree to the top.
+\subsubsection{PEP(Pessimistic-Error Pruning)}
+For a leaf node with N samples and E errors, its error rate $e$ is $\frac{E+0.5}{N}$. "0.5" is called penalty factor. For a subtree with L leaf nodes, its error rate is 
+$$ \ p = \frac{\sum_{i=1}^{L}\ E_{i}+0.5L}{\sum_{i=1}^{L}\ N_{i}}$$
+Suppose that all the samples in a subtree is of binomial distribution $B(N,P)$, then the expectation and standard deviation of error before pruning are:
+$$\ E_{T} = N*p = N*\frac{\sum_{i=1}^{L}\ E_{i}+0.5L}{\sum_{i=1}^{L}\ N_{i}} = \sum_{i=1}^{L}\ E_{i}+0.5L $$
+$$\sigma = \sqrt{N*p*(1-p)}$$
+Expectation of error after pruning is:
+$$\ E_{t} = N*e = N*\frac{E+0.5}{N} = E+0.5$$
+If $$E_{t} - E_{T} < \sigma$$
+then prune the subtree. Repeat this process from the top of the tree to the bottom.
+\subsubsection{CCP(Cost-Complexity Pruning)}
+$\alpha$ is a real number called the complexity parameter, it's defined as follows: 
+$$\alpha = \frac{R(t)- R(T_{t})}{|T_{t}|-1},$$ where $R(t)$ is the error after pruning, $R(T_{t})$ is the error of the original subtree and $|T_{t}|$ is the number of samples in the subtree.\\
+Step1: Calculate the value of $\alpha$ for all the subtrees from the bottom to the top, each time prune the subtree with minimal $\alpha$. Get a set $\{T_{0}, T_{1},..., T_{M}\}$, where $T_{0}$ is a complete tree and $T_{M}$ is a root node.\\
+Step2: Pick the best tree from $\{T_{0}, T_{1},..., T_{M}\}$, according to its performance on the testing sets.\\
+*Note that if we use CCP to prune the tree, we should separate a testing set from the given training set before training begins.
+\section{Code structure}
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+	\tikzstyle{selected}=[draw=red,fill=red!30]
+	\tikzstyle{optional}=[dashed,fill=gray!50]
+	\begin{tikzpicture}[
+	grow via three points={one child at (0.5,-0.7) and two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+    \node {main.py}
+    child { node {data.py}
+        child {node {def get-data()}}
+    }
+    child [missing] {}
+	child { node [selected] {ccp-prune.py}
+		child { node {class Tree}
+			child { node {class Node}}
+		}
+		child [missing] {}	
+		child { node {def process()}
+		}
+    }
+    child [missing] {}
+	child [missing] {}
+	child [missing] {}	
+	child { node [selected] {pep-prune.py}};
+	\end{tikzpicture}
 \end{document}
